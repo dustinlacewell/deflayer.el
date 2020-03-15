@@ -16,7 +16,7 @@ switch between them easily.
 Let's use [[https://github.com/Kungsgeten/org-brain][Org-brain]] as an example.
 
 Org-brain requires you to specify where the org-mode files making up your brain
-are located with the =org-brain-path= setting defined in the ='org-brain= defcustom
+are located with the =org-brain-path= setting defined in the =org-brain= defcustom
 group.
 
 Let's specify the location of two!
@@ -36,7 +36,7 @@ Simply =(require 'deflayer)= and use the =(deflayer)= macro for each:
 We call =(deflayer NAME GROUP BODY)= twice. Once with settings for our first
 dataset, and once with settings for the second dataset.
 
-This will save the values of all variables in the ='org-brain= defcustom group to
+This will save the values of all variables in the =org-brain= defcustom group to
 a defaults cache.
 
 It will also produce two functions, =deflayer-activate-brain-one=, and
