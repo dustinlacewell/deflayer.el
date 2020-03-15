@@ -1,6 +1,50 @@
 * Deflayer.el
 
-Deflayer.el lets you define layers of configuration overrides
+Deflayer.el lets you define layers of configuration overrides.
+
+** What?
+
+Imagine you have some package that makes you configure where some data is.
+
+Well, what if you wanted to use that package with two or more different sets of
+data.
+
+This package will let you define the different configuration for each and
+switch between them easily.
+
+** How?
+Let's use [[https://github.com/Kungsgeten/org-brain][Org-brain]] as an example.
+
+Org-brain requires you to specify where the org-mode files making up your brain
+are located with the =org-brain-path= setting defined in the ='org-brain= defcustom
+group.
+
+Let's specify the location of two!
+
+Simply =(require 'deflayer)= and use the =(deflayer)= macro for each:
+
+#+begin_src emacs-lisp
+  (deflayer brain-one org-brain
+    (org-brain-path "~/org/brain-one/")
+    (whatever-other-settings "value one"))
+
+  (deflayer brain-two org-brain
+    (org-brain-path "~/org/brain-two/")
+    (whatever-other-settings "value two"))
+#+end_src
+
+We call =(deflayer NAME GROUP BODY)= twice. Once with settings for our first
+dataset, and once with settings for the second dataset.
+
+This will save the values of all variables in the ='org-brain= defcustom group to
+a defaults cache.
+
+It will also produce two functions, =deflayer-activate-brain-one=, and
+=deflayer-activate-brain-two=. Calling these functions will apply their
+respective configuration values specified in =BODY=.
+
+At anytime call =(deflayer-restore GROUP)= with any defcustom group to reset
+all configuration values to their defaults.
 
 * Installation
 
@@ -21,18 +65,3 @@ Deflayer.el lets you define layers of configuration overrides
 
 There are no configuration options yet!
 
-* Usage
-
-Simply =(require 'deflayer)= and use the =(deflayer)= macro:
-
-#+begin_src emacs-lisp
-  (deflayer philosophy-brain org-brain
-    (org-brain-path "~/org/philosophy/")
-    (whatever-other-settings "value override"))
-#+end_src
-
-This will call =(deflayer-save 'org-brain)= and produce a function
-=deflayer-activate-philosophy-brain= that will set the specified settings.
-
-At anytime call =(deflayer-restore 'org-brain)= with any defcustom group to reset
-all configuration values to their defaults.
