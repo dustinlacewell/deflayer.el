@@ -23,7 +23,7 @@ There are no configuration options yet!
 
 * Usage
 
-Simply ==(require 'deflayer)== and use the =(deflayer)= macro:
+Simply =(require 'deflayer)= and use the =(deflayer)= macro:
 
 #+begin_src emacs-lisp
   (deflayer philosophy-brain org-brain
