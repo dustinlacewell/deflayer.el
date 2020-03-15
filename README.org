@@ -1,0 +1,38 @@
+* Deflayer.el
+
+Deflayer.el lets you define layers of configuration overrides
+
+* Installation
+
+** el-get
+#+begin_src emacs-lisp
+  (el-get-bundle deflayer
+    :url "https://github.com/dustinlacewell/deflayer.el.git"
+    :features deflayer)
+#+end_src
+
+** straight.el
+#+begin_src emacs-lisp
+  (use-package deflayer
+    :straight (deflayer :type git :host github :repo "dustinlacewell/deflayer.el")
+#+end_src
+
+* Configuration
+
+There are no configuration options yet!
+
+* Usage
+
+Simply ==(require 'deflayer)== and use the =(deflayer)= macro:
+
+#+begin_src emacs-lisp
+  (deflayer philosophy-brain org-brain
+    (org-brain-path "~/org/philosophy/")
+    (whatever-other-settings "value override"))
+#+end_src
+
+This will call =(deflayer-save 'org-brain)= and produce a function
+=deflayer-activate-philosophy-brain= that will set the specified settings.
+
+At anytime call =(deflayer-restore 'org-brain)= with any defcustom group to reset
+all configuration values to their defaults.

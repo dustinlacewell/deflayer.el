@@ -1,0 +1,77 @@
+* deflayer.el
+:properties:
+:header-args: :tangle yes
+:end:
+** package prologue
+#+begin_src emacs-lisp
+  ;;; deflayer.el --- Polymode support for Org-brain -*- lexical-binding: t; -*-
+  ;; Copyright (C) 2020 Dustin Lacewell
+
+  ;; Author: Dustin Lacewell <dlacewell@gmail.com>
+  ;; Version: 0.1.0
+  ;; Package-Requires: ((emacs "26") (dash "0"))
+  ;; Keywords: layers, configuration
+  ;; URL: http://github.com/dustinlacewell/deflayer.el
+
+  ;;; Commentary:
+
+  ;; This package lets create configuration override layers
+
+  ;;; Code:
+  (require 'dash)
+#+end_src
+
+** state
+*** deflayer--layers
+#+begin_src emacs-lisp
+  (defvar deflayer--layers (make-hash-table))
+#+end_src
+
+** boilerplate
+*** deflayer--get-all-settings
+#+begin_src emacs-lisp
+  (defun deflayer--get-all-settings (group)
+    (let* ((config-alist (symbol-plist group))
+           (culled-alist (-drop-while (lambda (x) (not (eq x 'custom-group))) config-alist))
+           (dirty-settings (car (cdr culled-alist)))
+           (filtered-settings (--remove (not (eq (cadr it) 'custom-variable)) dirty-settings)))
+      (-map 'car filtered-settings)))
+#+end_src
+
+*** deflayer--function-name-for-group
+#+begin_src emacs-lisp
+  (defun deflayer--function-name-for-group (group)
+   (format "deflayer-activate-%s" (symbol-name name)))
+#+end_src
+
+** api
+*** deflayer-save
+#+begin_src emacs-lisp
+  (defun deflayer-save (group)
+    (map-put deflayer--layers group
+             (--map (list it (symbol-value it)) (deflayer--get-all-settings group))))
+#+end_src
+
+*** deflayer-restore
+#+begin_src emacs-lisp
+  (defun deflayer-restore (group)
+    (let ((defaults (map-elt deflayer--layers group))))
+    (--each deflayer--defaults (set (car it) (cadr it))))
+#+end_src
+
+*** deflayer
+#+begin_src emacs-lisp
+  (defmacro deflayer (name group body)
+    (deflayer-save group)
+    `(defun ,(intern (deflayer--function-name-for-group group)) ()
+       (deflayer-restore (quote ,group))
+       ,@(--map (list 'setq (car it) (cadr it)) body)))
+#+end_src
+
+** package epilogue
+#+begin_src emacs-lisp
+  (provide 'deflayer)
+
+  ;;; deflayer.el ends here
+#+end_src
+
