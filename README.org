@@ -25,12 +25,12 @@ Simply =(require 'deflayer)= and use the =(deflayer)= macro for each:
 
 #+begin_src emacs-lisp
   (deflayer brain-one org-brain
-    (org-brain-path "~/org/brain-one/")
-    (whatever-other-settings "value one"))
+    ((org-brain-path "~/org/brain-one/")
+     (whatever-other-settings "value one")))
 
   (deflayer brain-two org-brain
-    (org-brain-path "~/org/brain-two/")
-    (whatever-other-settings "value two"))
+    ((org-brain-path "~/org/brain-two/")
+     (whatever-other-settings "value two")))
 #+end_src
 
 We call =(deflayer NAME GROUP BODY)= twice. Once with settings for our first
