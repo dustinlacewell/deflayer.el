@@ -24,13 +24,15 @@
 ** state
 *** deflayer--layers
 #+begin_src emacs-lisp
-  (defvar deflayer--layers (make-hash-table))
+    (defvar deflayer--layers (make-hash-table)
+      "A hashtable mapping defcustom groups to a list of configuration defaults")
 #+end_src
 
 ** boilerplate
 *** deflayer--get-all-settings
 #+begin_src emacs-lisp
   (defun deflayer--get-all-settings (group)
+    "Get a list of all variable names in defcustom group GROUP."
     (let* ((config-alist (symbol-plist group))
            (culled-alist (-drop-while (lambda (x) (not (eq x 'custom-group))) config-alist))
            (dirty-settings (car (cdr culled-alist)))
@@ -41,13 +43,16 @@
 *** deflayer--get-activation-name
 #+begin_src emacs-lisp
   (defun deflayer--get-activation-name (name)
-   (format "deflayer-activate-%s" name))
+    "Produce a activation function name from NAME."
+    (format "deflayer-activate-%s" name))
 #+end_src
 
 ** api
 *** deflayer-save
 #+begin_src emacs-lisp
   (defun deflayer-save (group)
+    "Save the current values for all variables in defcustom group
+  GROUP to deflayer--layers hashtable."
     (map-put deflayer--layers group
              (--map (list it (symbol-value it)) (deflayer--get-all-settings group))))
 #+end_src
@@ -55,6 +60,7 @@
 *** deflayer-restore
 #+begin_src emacs-lisp
   (defun deflayer-restore (group)
+    "Restore all cached defaults for defcustom group GROUP."
     (let ((defaults (map-elt deflayer--layers group)))
       (--each defaults (set (car it) (cadr it)))))
 #+end_src
@@ -62,6 +68,10 @@
 *** deflayer
 #+begin_src emacs-lisp
   (defmacro deflayer (name group body)
+    "Save the current values for all variables in the defcustom
+  group GROUP and produce a function with name based on NAME which
+  sets the variable values specified as list of name value pairs in
+  BODY."
     (deflayer-save group)
     `(defun ,(intern (deflayer--get-activation-name name)) ()
        (deflayer-restore (quote ,group))

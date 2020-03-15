@@ -14,9 +14,11 @@
 ;;; Code:
 (require 'dash)
 
-(defvar deflayer--layers (make-hash-table))
+(defvar deflayer--layers (make-hash-table)
+  "A hashtable mapping defcustom groups to a list of configuration defaults")
 
 (defun deflayer--get-all-settings (group)
+  "Get a list of all variable names in defcustom group GROUP."
   (let* ((config-alist (symbol-plist group))
          (culled-alist (-drop-while (lambda (x) (not (eq x 'custom-group))) config-alist))
          (dirty-settings (car (cdr culled-alist)))
@@ -24,17 +26,25 @@
     (-map 'car filtered-settings)))
 
 (defun deflayer--get-activation-name (name)
- (format "deflayer-activate-%s" name))
+  "Produce a activation function name from NAME."
+  (format "deflayer-activate-%s" name))
 
 (defun deflayer-save (group)
+  "Save the current values for all variables in defcustom group
+GROUP to deflayer--layers hashtable."
   (map-put deflayer--layers group
            (--map (list it (symbol-value it)) (deflayer--get-all-settings group))))
 
 (defun deflayer-restore (group)
+  "Restore all cached defaults for defcustom group GROUP."
   (let ((defaults (map-elt deflayer--layers group)))
     (--each defaults (set (car it) (cadr it)))))
 
 (defmacro deflayer (name group body)
+  "Save the current values for all variables in the defcustom
+group GROUP and produce a function with name based on NAME which
+sets the variable values specified as list of name value pairs in
+BODY."
   (deflayer-save group)
   `(defun ,(intern (deflayer--get-activation-name name)) ()
      (deflayer-restore (quote ,group))
