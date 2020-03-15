@@ -23,20 +23,20 @@
          (filtered-settings (--remove (not (eq (cadr it) 'custom-variable)) dirty-settings)))
     (-map 'car filtered-settings)))
 
-(defun deflayer--function-name-for-group (group)
- (format "deflayer-activate-%s" (symbol-name name)))
+(defun deflayer--get-activation-name (name)
+ (format "deflayer-activate-%s" name))
 
 (defun deflayer-save (group)
   (map-put deflayer--layers group
            (--map (list it (symbol-value it)) (deflayer--get-all-settings group))))
 
 (defun deflayer-restore (group)
-  (let ((defaults (map-elt deflayer--layers group))))
-  (--each deflayer--defaults (set (car it) (cadr it))))
+  (let ((defaults (map-elt deflayer--layers group)))
+    (--each defaults (set (car it) (cadr it)))))
 
 (defmacro deflayer (name group body)
   (deflayer-save group)
-  `(defun ,(intern (deflayer--function-name-for-group group)) ()
+  `(defun ,(intern (deflayer--get-activation-name name)) ()
      (deflayer-restore (quote ,group))
      ,@(--map (list 'setq (car it) (cadr it)) body)))
 
