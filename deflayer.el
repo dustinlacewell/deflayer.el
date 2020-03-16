@@ -47,6 +47,7 @@ sets the variable values specified as list of name value pairs in
 BODY."
   (deflayer-save group)
   `(defun ,(intern (deflayer--get-activation-name name)) ()
+     (interactive)
      (deflayer-restore (quote ,group))
      ,@(--map (list 'setq (car it) (cadr it)) body)))
 
