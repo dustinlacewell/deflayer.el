@@ -32,7 +32,7 @@
 (defun deflayer-save (group)
   "Save the current values for all variables in defcustom group
 GROUP to deflayer--layers hashtable."
-  (map-put deflayer--layers group
+  (map-put! deflayer--layers group
            (--map (list it (symbol-value it)) (deflayer--get-all-settings group))))
 
 (defun deflayer-restore (group)
